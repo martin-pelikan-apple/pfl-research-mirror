@@ -380,6 +380,8 @@ class PyTorchModel(StatefulModel):
         batch_size = (len(dataset) if eval_params is None
                       or eval_params.local_batch_size is None else
                       eval_params.get('local_batch_size'))
+        local_num_steps = (eval_params.get('local_num_steps')
+                           if eval_params is not None else None)
         assert isinstance(batch_size, int)
         metrics = Zero
 
@@ -387,6 +389,10 @@ class PyTorchModel(StatefulModel):
         allows_distributed_evaluation = True
         amp_context = self._amp_context or contextlib.nullcontext()
         for batch_ix, batch in enumerate(dataset.iter(batch_size)):
+            # If the local number of batches is limited in the training,
+            # we do the same in the evaluation.
+            if batch_ix == local_num_steps:
+                break
             metrics_one_batch = Metrics()
             batch = self._prepare_batch(batch)
             with amp_context:

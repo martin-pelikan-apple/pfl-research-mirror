@@ -333,7 +333,14 @@ class TFModel(StatefulModel):
 
         batch_size = (None if eval_params is None else
                       eval_params.get('local_batch_size'))
-        for batch_inputs, batch_labels in dataset.iter(batch_size):
+        local_num_steps = (eval_params.get('local_num_steps')
+                           if eval_params is not None else None)
+        for batch_ix, (batch_inputs,
+                       batch_labels) in enumerate(dataset.iter(batch_size)):
+            # If the local number of batches is limited in the training,
+            # we do the same in the evaluation.
+            if batch_ix == local_num_steps:
+                break
             preds = tensorflow_ops.try_cached_call(
                 self._forward_prop,
                 f'evaluate_forward_prop-{self._postfix}',
