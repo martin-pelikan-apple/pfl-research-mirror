@@ -337,8 +337,7 @@ class TFModel(StatefulModel):
                            if eval_params is not None else None)
         for batch_ix, (batch_inputs,
                        batch_labels) in enumerate(dataset.iter(batch_size)):
-            # If the local number of batches is limited in the training,
-            # we do the same in the evaluation.
+            # Limit the number of local batches for evaluation if needed.
             if batch_ix == local_num_steps:
                 break
             preds = tensorflow_ops.try_cached_call(

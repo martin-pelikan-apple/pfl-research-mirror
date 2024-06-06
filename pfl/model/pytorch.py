@@ -389,8 +389,7 @@ class PyTorchModel(StatefulModel):
         allows_distributed_evaluation = True
         amp_context = self._amp_context or contextlib.nullcontext()
         for batch_ix, batch in enumerate(dataset.iter(batch_size)):
-            # If the local number of batches is limited in the training,
-            # we do the same in the evaluation.
+            # Limit the number of local batches for evaluation if needed.
             if batch_ix == local_num_steps:
                 break
             metrics_one_batch = Metrics()

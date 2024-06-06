@@ -149,19 +149,17 @@ class NNEvalHyperParams(ModelHyperParams):
         The batch size for evaluating locally on device.
         If `None`, defaults to no batching (full-batch evaluation).
     :param local_num_steps:
-        The number of batches to iterate through in the training and evaluation
+        The number of batches to iterate through in the evaluation
         of the model. This can be helpful for example if some users have
         orders of magnitude more data than others, and we want to limit
-        the amount of computation in each evaluation call. Local training
-        is typically restricted by the local number of epochs, not the
-        number of local steps.
+        the amount of computation in each evaluation call.
     """
     local_batch_size: Optional[HyperParamClsOrInt]
-    local_num_steps: Optional[HyperParamClsOrInt]
+    local_num_steps: Optional[HyperParamClsOrInt] = None
 
 
 @dataclass(frozen=True)
-class NNTrainHyperParams(NNEvalHyperParams):
+class NNTrainHyperParams(ModelHyperParams):
     """
     Config to use for training any neural network with an algorithm that
     involves SGD.
@@ -193,7 +191,9 @@ class NNTrainHyperParams(NNEvalHyperParams):
     """
     local_num_epochs: Optional[HyperParamClsOrInt]
     local_learning_rate: HyperParamClsOrFloat
+    local_batch_size: Optional[HyperParamClsOrInt]
     local_max_grad_norm: Optional[HyperParamClsOrFloat] = None
+    local_num_steps: Optional[HyperParamClsOrInt] = None
     grad_accumulation_steps: int = 1
 
     def __post_init__(self):
